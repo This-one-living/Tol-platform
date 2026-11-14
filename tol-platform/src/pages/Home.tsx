@@ -17,10 +17,12 @@ const initials = (name: string) =>
   name.split(' ').map((n) => n[0]).join('').slice(0, 2)
 
 export default function Home() {
+  const profilePhoto = localStorage.getItem('tol_profile_photo') || '';
+
   return (
     <>
       <section className="hero">
-        <h1>Welcome to The One Living</h1>
+        <h1>Welcome back</h1>
         <p>
           Meet professionals across Ebonyi State, build your network and grow
           together.
@@ -29,9 +31,13 @@ export default function Home() {
           <Link to="/discover" className="btn btn-primary">
             Find people
           </Link>
-          <Link to="/signup" className="btn btn-secondary">
-            Complete your profile
-          </Link>
+          {profilePhoto && (
+            <img
+              src={profilePhoto}
+              alt="Profile"
+              style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.7)' }}
+            />
+          )}
         </div>
       </section>
 

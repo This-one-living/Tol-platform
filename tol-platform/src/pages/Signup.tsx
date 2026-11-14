@@ -17,6 +17,7 @@ export default function Signup() {
   const [f, setF] = useState<FormState>(empty);
   const [communities, setCommunities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -24,10 +25,27 @@ export default function Signup() {
     setF((prev) => ({ ...prev, [k]: e.target.value }));
   const isOther = f.niche === 'Other';
 
+  const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setPhotoPreview('');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setPhotoPreview(String(reader.result || ''));
+    reader.readAsDataURL(file);
+  };
+
   // When the LGA changes, reset the community and load that LGA's communities
   useEffect(() => {
     setF((p) => ({ ...p, community: '' }));
     if (!f.lga) { setCommunities([]); return; }
+    if (!supabase) {
+      setCommunities([]);
+      return;
+    }
+
     supabase.from('communities').select('name').eq('lga', f.lga).order('name')
       .then(({ data }) => setCommunities((data ?? []).map((c: { name: string }) => c.name)));
   }, [f.lga]);
@@ -48,6 +66,16 @@ export default function Signup() {
     if (f.password !== f.confirm) return setError('Passwords do not match.');
     if (!/^(\+234|0)[789]\d{9}$/.test(f.phone.replace(/\s/g, ''))) return setError('Enter a valid Nigerian phone number.');
 
+    if (!supabase) {
+      if (photoPreview) {
+        localStorage.setItem('tol_profile_photo', photoPreview);
+      }
+      localStorage.setItem('tol_profile_complete', 'true');
+      localStorage.setItem('tol_session', 'true');
+      window.location.href = '/home';
+      return;
+    }
+
     setBusy(true);
     const { data, error: authErr } = await supabase.auth.signUp({ email: f.email, password: f.password });
     if (authErr || !data.user) {
@@ -64,7 +92,14 @@ export default function Signup() {
     });
     setBusy(false);
     if (profErr) return setError(profErr.message);
-    window.location.href = '/';
+
+    if (photoPreview) {
+      localStorage.setItem('tol_profile_photo', photoPreview);
+    }
+
+    localStorage.setItem('tol_profile_complete', 'true');
+    localStorage.setItem('tol_session', 'true');
+    window.location.href = '/home';
   }
 
   return (
@@ -79,6 +114,19 @@ export default function Signup() {
         <label>Password<input required type="password" value={f.password} onChange={set('password')} /></label>
         <label>Confirm password<input required type="password" value={f.confirm} onChange={set('confirm')} /></label>
       </div>
+
+      <label>Profile photo
+        <input type="file" accept="image/*" onChange={handlePhotoChange} />
+      </label>
+      {photoPreview && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+          <img
+            src={photoPreview}
+            alt="Profile preview"
+            style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', border: '2px solid #dfe7f5' }}
+          />
+        </div>
+      )}
 
       <label>State<input value="Ebonyi" disabled /></label>
       <div className="row">

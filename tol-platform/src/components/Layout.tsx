@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 const links = [
-  { to: '/', label: 'Home', icon: Home, end: true },
+  { to: '/home', label: 'Home', icon: Home, end: true },
   { to: '/discover', label: 'Discover', icon: Compass },
   { to: '/connections', label: 'Connections', icon: Users },
   { to: '/messages', label: 'Messages', icon: MessageSquare },
@@ -23,7 +23,7 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <NavLink to="/" className="brand">
+        <NavLink to="/home" className="brand">
           The One Living
         </NavLink>
         <nav className="nav">
