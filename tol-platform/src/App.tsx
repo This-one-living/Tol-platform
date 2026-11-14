@@ -1,10 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import Layout from './components/Layout'
-import Auth from './pages/Auth'
-import Home from './pages/Home'
-import Discover from './pages/Discover'
-import Settings from './pages/Settings'
-import Signup from './pages/Signup'
+import Layout from './components/Layout.tsx'
+import Auth from './pages/Auth.tsx'
+import Home from './pages/Home.tsx'
+import Discover from './pages/Discover.tsx'
+import Settings from './pages/Settings.tsx'
+import Signup from './pages/Signup.tsx'
 
 const isProfileComplete = () => {
   try {
