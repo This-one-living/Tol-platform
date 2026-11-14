@@ -3,9 +3,16 @@ import Layout from './components/Layout'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
 import Discover from './pages/Discover'
+import Settings from './pages/Settings'
 import Signup from './pages/Signup'
 
-const isProfileComplete = () => localStorage.getItem('tol_profile_complete') === 'true'
+const isProfileComplete = () => {
+  try {
+    return localStorage.getItem('tol_profile_complete') === 'true' || localStorage.getItem('tol_session') === 'true'
+  } catch {
+    return false
+  }
+}
 
 export default function App() {
   return (
@@ -18,10 +25,10 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     </BrowserRouter>
   )

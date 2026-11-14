@@ -67,12 +67,15 @@ export default function Signup() {
     if (!/^(\+234|0)[789]\d{9}$/.test(f.phone.replace(/\s/g, ''))) return setError('Enter a valid Nigerian phone number.');
 
     if (!supabase) {
+      localStorage.setItem('tol_user_email', f.email.toLowerCase());
+      localStorage.setItem('tol_user_phone', f.phone.replace(/\s+/g, ''));
+      localStorage.setItem('tol_user_password', f.password);
       if (photoPreview) {
         localStorage.setItem('tol_profile_photo', photoPreview);
       }
       localStorage.setItem('tol_profile_complete', 'true');
       localStorage.setItem('tol_session', 'true');
-      window.location.href = '/home';
+      window.location.replace('/home');
       return;
     }
 
@@ -93,13 +96,17 @@ export default function Signup() {
     setBusy(false);
     if (profErr) return setError(profErr.message);
 
+    localStorage.setItem('tol_user_email', f.email.toLowerCase());
+    localStorage.setItem('tol_user_phone', f.phone.replace(/\s+/g, ''));
+    localStorage.setItem('tol_user_password', f.password);
+
     if (photoPreview) {
       localStorage.setItem('tol_profile_photo', photoPreview);
     }
 
     localStorage.setItem('tol_profile_complete', 'true');
     localStorage.setItem('tol_session', 'true');
-    window.location.href = '/home';
+    window.location.replace('/home');
   }
 
   return (
@@ -115,7 +122,7 @@ export default function Signup() {
         <label>Confirm password<input required type="password" value={f.confirm} onChange={set('confirm')} /></label>
       </div>
 
-      <label>Profile photo
+      <label>Profile photo (optional)
         <input type="file" accept="image/*" onChange={handlePhotoChange} />
       </label>
       {photoPreview && (
