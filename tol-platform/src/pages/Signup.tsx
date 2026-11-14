@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { EBONYI_LGAS, NICHES } from '../data/reference';
+import { EBONYI_LGAS, NICHES, NICHE_CATEGORIES } from '../data/reference';
 
 type FormState = {
   full_name: string; phone: string; email: string; password: string; confirm: string;
@@ -36,8 +36,9 @@ export default function Signup() {
   useEffect(() => {
     setF((p) => ({ ...p, category: '' }));
     if (!f.niche || f.niche === 'Other') { setCategories([]); return; }
-    supabase.from('categories').select('name').eq('niche', f.niche).order('name')
-      .then(({ data }) => setCategories((data ?? []).map((c: { name: string }) => c.name)));
+
+    const nicheCategories = NICHE_CATEGORIES[f.niche] ?? [];
+    setCategories(nicheCategories);
   }, [f.niche]);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
