@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 
 export default function Auth() {
   const navigate = useNavigate()
@@ -8,7 +9,7 @@ export default function Auth() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
 
@@ -20,15 +21,48 @@ export default function Auth() {
       return setError('Enter your password.')
     }
 
-    setBusy(true)
-
     const value = identifier.trim()
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
     const isPhone = /^(\+234|0)[789]\d{9}$/.test(value.replace(/\s+/g, ''))
 
+    if (supabase && !isEmail) {
+      return setError('Use the email address you registered with to sign in.')
+    }
+
     if (!isEmail && !isPhone) {
-      setBusy(false)
       return setError('Use a valid email address or Nigerian phone number.')
+    }
+
+    setBusy(true)
+
+    if (supabase) {
+      try {
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email: value.toLowerCase(),
+          password,
+        })
+
+        if (authError) {
+          if (authError.message.toLowerCase().includes('email not confirmed')) {
+            setError('Confirm your email address before signing in.')
+          } else if (authError.message.toLowerCase().includes('invalid login credentials')) {
+            setError('Email or password is incorrect.')
+          } else {
+            setError(authError.message)
+          }
+          return
+        }
+
+        localStorage.removeItem('tol_user_password')
+        localStorage.setItem('tol_profile_complete', 'true')
+        localStorage.setItem('tol_session', 'true')
+        navigate('/home', { replace: true })
+      } catch (authError) {
+        setError(authError instanceof Error ? authError.message : 'Could not sign in. Please try again.')
+      } finally {
+        setBusy(false)
+      }
+      return
     }
 
     const storedEmail = localStorage.getItem('tol_user_email')
@@ -60,17 +94,19 @@ export default function Auth() {
     <div className="tol-form" style={{ maxWidth: 480, padding: '48px 0' }}>
       <h1>Welcome to The One Living</h1>
       <p className="muted">
-        Sign in with your email or phone number and password.
+        {supabase
+          ? 'Sign in with the email address and password you registered with.'
+          : 'Sign in with your email or phone number and password.'}
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
         <label>
-          Email or phone number
+          {supabase ? 'Email address' : 'Email or phone number'}
           <input
             type="text"
             value={identifier}
             onChange={(event) => setIdentifier(event.target.value)}
-            placeholder="you@example.com or 0803..."
+            placeholder={supabase ? 'you@example.com' : 'you@example.com or 0803...'}
             autoComplete="username"
           />
         </label>

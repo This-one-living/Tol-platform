@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { EBONYI_LGAS, NICHES, NICHE_CATEGORIES } from '../data/reference';
 
@@ -80,33 +81,46 @@ export default function Signup() {
     }
 
     setBusy(true);
-    const { data, error: authErr } = await supabase.auth.signUp({ email: f.email, password: f.password });
-    if (authErr || !data.user) {
+    try {
+      const { data, error: authErr } = await supabase.auth.signUp({ email: f.email, password: f.password });
+      if (authErr) {
+        if (authErr.message.toLowerCase().includes('already registered')) {
+          return setError('This email is already registered. Sign in with your existing account instead.');
+        }
+        return setError(authErr.message);
+      }
+      if (!data.user) {
+        return setError('Could not create the account. Please try again.');
+      }
+      if (data.user.identities?.length === 0) {
+        return setError('This email is already registered. Sign in with your existing account instead.');
+      }
+
+      const list = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean);
+      const { error: profErr } = await supabase.from('profiles').insert({
+        id: data.user.id, full_name: f.full_name, phone: f.phone, state: 'Ebonyi',
+        lga: f.lga, community: f.community || 'Other',
+        niche: f.niche, category: f.category || null, other_niche: isOther ? f.other_niche : null,
+        interests: list(f.interests), skills: list(f.skills),
+      });
+      if (profErr) return setError(profErr.message);
+
+      localStorage.setItem('tol_user_email', f.email.toLowerCase());
+      localStorage.setItem('tol_user_phone', f.phone.replace(/\s+/g, ''));
+      localStorage.removeItem('tol_user_password');
+
+      if (photoPreview) {
+        localStorage.setItem('tol_profile_photo', photoPreview);
+      }
+
+      localStorage.setItem('tol_profile_complete', 'true');
+      localStorage.setItem('tol_session', 'true');
+      window.location.replace('/home');
+    } catch (signupError) {
+      setError(signupError instanceof Error ? signupError.message : 'Could not create the account. Please try again.');
+    } finally {
       setBusy(false);
-      return setError(authErr?.message ?? 'Could not create the account. Please try again.');
     }
-
-    const list = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean);
-    const { error: profErr } = await supabase.from('profiles').insert({
-      id: data.user.id, full_name: f.full_name, phone: f.phone, state: 'Ebonyi',
-      lga: f.lga, community: f.community || 'Other',
-      niche: f.niche, category: f.category || null, other_niche: isOther ? f.other_niche : null,
-      interests: list(f.interests), skills: list(f.skills),
-    });
-    setBusy(false);
-    if (profErr) return setError(profErr.message);
-
-    localStorage.setItem('tol_user_email', f.email.toLowerCase());
-    localStorage.setItem('tol_user_phone', f.phone.replace(/\s+/g, ''));
-    localStorage.setItem('tol_user_password', f.password);
-
-    if (photoPreview) {
-      localStorage.setItem('tol_profile_photo', photoPreview);
-    }
-
-    localStorage.setItem('tol_profile_complete', 'true');
-    localStorage.setItem('tol_session', 'true');
-    window.location.replace('/home');
   }
 
   return (
@@ -173,6 +187,7 @@ export default function Signup() {
 
       {error && <p className="error" role="alert">{error}</p>}
       <button className="btn-primary" disabled={busy}>{busy ? 'Creating account…' : 'Create account'}</button>
+      <p className="muted">Already registered? <Link to="/auth">Log in</Link>.</p>
     </form>
   );
 }

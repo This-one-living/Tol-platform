@@ -1,9 +1,30 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 
 export default function Settings() {
   const navigate = useNavigate()
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setError('')
+    setBusy(true)
+    if (supabase) {
+      try {
+        const { error: authError } = await supabase.auth.signOut()
+        if (authError) {
+          setError(authError.message)
+          setBusy(false)
+          return
+        }
+      } catch (authError) {
+        setError(authError instanceof Error ? authError.message : 'Could not log out. Please try again.')
+        setBusy(false)
+        return
+      }
+    }
+
     localStorage.removeItem('tol_session')
     localStorage.removeItem('tol_profile_complete')
     localStorage.removeItem('tol_user_email')
@@ -24,8 +45,10 @@ export default function Settings() {
           Back to home
         </button>
 
-        <button type="button" className="btn btn-primary" onClick={handleLogout}>
-          Log out
+        {error && <p className="error" role="alert">{error}</p>}
+
+        <button type="button" className="btn btn-primary" onClick={handleLogout} disabled={busy}>
+          {busy ? 'Logging out...' : 'Log out'}
         </button>
       </div>
     </div>
