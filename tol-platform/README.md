@@ -1,5 +1,11 @@
 # React + TypeScript + Vite
 
+## Direct messaging setup
+
+The Messages page uses Supabase Auth, Postgres, and Realtime. Before deploying it, apply [`supabase/migrations/20261115000000_direct_messages.sql`](./supabase/migrations/20261115000000_direct_messages.sql) to the Supabase project that contains the app's `profiles` table. The migration creates direct conversations, message storage, participant-only row-level security, and Realtime publication for new messages.
+
+Users must be signed in and have a profile before they can start a conversation. Profile search only returns display name, niche, and community.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

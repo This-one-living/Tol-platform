@@ -5,6 +5,7 @@ import Home from './pages/Home.tsx'
 import Discover from './pages/Discover.tsx'
 import Settings from './pages/Settings.tsx'
 import Signup from './pages/Signup.tsx'
+import Messages from './pages/Messages.tsx'
 
 const isProfileComplete = () => {
   try {
@@ -25,6 +26,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 
