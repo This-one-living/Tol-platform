@@ -1,0 +1,46 @@
+.settings-page { display: grid; max-width: 760px; gap: 18px; margin: 0 auto; }
+.settings-heading h1 { margin-bottom: 5px; }
+.settings-heading p { margin: 0; }
+.settings-card h2 { margin-bottom: 6px; font-size: 1.2rem; }
+.settings-card > .muted { margin-bottom: 18px; }
+.settings-form { display: grid; gap: 14px; }
+.settings-form label { display: grid; gap: 6px; }
+.settings-form textarea { min-height: 76px; }
+
+.profile-photo-editor { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 4px; }
+.profile-photo-editor img,
+.profile-photo-placeholder {
+  display: grid;
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  place-items: center;
+  border: 2px solid var(--primary-border);
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  object-fit: cover;
+}
+.profile-photo-editor label { position: relative; display: inline-flex; cursor: pointer; }
+.profile-photo-editor input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.profile-photo-editor label:focus-within { outline: 3px solid var(--primary-border); outline-offset: 2px; }
+.profile-photo-editor small { flex-basis: 100%; margin-left: 100px; }
+
+.success { margin: 0; color: var(--success); font-size: .9rem; }
+.settings-session { display: grid; gap: 8px; }
+.settings-session h2,
+.settings-session p { margin: 0; }
+.settings-session button { justify-self: start; margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .profile-photo-editor small { margin-left: 0; }
+}

@@ -122,6 +122,10 @@ export default function Auth() {
           />
         </label>
 
+        <Link to="/forgot-password" className="muted" style={{ justifySelf: 'end' }}>
+          Forgot password?
+        </Link>
+
         {error ? <p className="error" role="alert">{error}</p> : null}
 
         <button className="btn-primary" type="submit" disabled={busy}>

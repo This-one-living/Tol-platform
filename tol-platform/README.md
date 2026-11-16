@@ -18,6 +18,10 @@ Apply [`supabase/migrations/20261116000001_builtin_community_groups.sql`](./supa
 
 To create 20 confirmed test accounts with matching Discover profiles, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in a local PowerShell session, then run `npm run seed:test-accounts`. The script prints the generated emails and one shared random password. The service-role key is read only by this local script; never add it to frontend `VITE_` variables or commit it.
 
+## Profile editing and password recovery
+
+Apply [`supabase/migrations/20261116000002_profile_editing.sql`](./supabase/migrations/20261116000002_profile_editing.sql) to add the profile photo column, private profile read/update functions, and the per-user photo upload bucket. Add `https://<your-app-domain>/reset-password` to the Supabase Auth redirect URL allowlist so recovery links can return to the app.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -7,6 +7,8 @@ import Settings from './pages/Settings.tsx'
 import Signup from './pages/Signup.tsx'
 import Messages from './pages/Messages.tsx'
 import Communities from './pages/Communities.tsx'
+import ForgotPassword from './pages/ForgotPassword.tsx'
+import ResetPassword from './pages/ResetPassword.tsx'
 
 const isProfileComplete = () => {
   try {
@@ -23,6 +25,8 @@ export default function App() {
         <Route path="/" element={isProfileComplete() ? <Navigate to="/home" replace /> : <Navigate to="/auth" replace />} />
         <Route path="/auth" element={isProfileComplete() ? <Navigate to="/home" replace /> : <Auth />} />
         <Route path="/login" element={isProfileComplete() ? <Navigate to="/home" replace /> : <Auth />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
