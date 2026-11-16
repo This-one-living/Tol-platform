@@ -1,0 +1,99 @@
+.connections-page { display: grid; gap: 22px; }
+
+.connections-heading h1 { margin: 0 0 5px; }
+.connections-heading .muted { margin: 0; }
+.connections-eyebrow {
+  margin: 0 0 5px;
+  color: var(--primary);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.connections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.connection-card {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.connection-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-border);
+  box-shadow: 0 8px 22px rgba(23, 78, 166, .1);
+}
+
+.connection-card:focus-visible { outline: 3px solid var(--primary-border); outline-offset: 3px; }
+.connection-card > svg { flex: 0 0 auto; color: var(--primary); }
+.connection-card-copy { display: grid; min-width: 0; gap: 5px; }
+.connection-card-copy strong { overflow: hidden; color: #23344c; text-overflow: ellipsis; white-space: nowrap; }
+.connection-card-copy span { overflow: hidden; color: var(--text-muted); font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
+
+.connections-empty { display: grid; justify-items: center; gap: 10px; padding: 48px 24px; text-align: center; }
+.connections-empty-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 14px; background: var(--primary-soft); color: var(--primary); }
+.connections-empty h2 { margin: 4px 0 0; }
+.connections-empty p { max-width: 42ch; margin: 0 0 5px; }
+
+.connection-dialog {
+  width: min(520px, calc(100% - 32px));
+  max-width: 520px;
+  max-height: min(85vh, 720px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(10, 25, 50, .22);
+}
+
+.connection-dialog::backdrop {
+  background: rgba(15, 27, 44, .32);
+  backdrop-filter: blur(5px);
+}
+
+.connection-dialog-content { padding: clamp(24px, 5vw, 36px); }
+.connection-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.connection-dialog-heading h2 { margin: 0; color: #1b2c45; font-size: 1.55rem; }
+.connection-dialog-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.connection-dialog-close:hover { background: var(--bg); color: var(--text); }
+
+.connection-details { display: grid; gap: 0; margin: 24px 0; }
+.connection-details > div { padding: 13px 0; border-bottom: 1px solid var(--border); }
+.connection-details > div:first-child { border-top: 1px solid var(--border); }
+.connection-details dt { margin-bottom: 4px; color: var(--text-muted); font-size: .76rem; font-weight: 600; }
+.connection-details dd { margin: 0; color: #26364d; font-size: .95rem; line-height: 1.55; overflow-wrap: anywhere; }
+.connection-details a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.connection-details a:hover { text-decoration: underline; }
+
+.connection-chat-button { width: 100%; }
+.connection-chat-button svg { width: 18px; height: 18px; }
+
+@media (max-width: 520px) {
+  .connections-grid { grid-template-columns: 1fr; }
+  .connection-card { padding: 17px; }
+}

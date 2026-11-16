@@ -7,6 +7,7 @@ import Settings from './pages/Settings.tsx'
 import Signup from './pages/Signup.tsx'
 import Messages from './pages/Messages.tsx'
 import Communities from './pages/Communities.tsx'
+import Connections from './pages/Connections.tsx'
 import ForgotPassword from './pages/ForgotPassword.tsx'
 import ResetPassword from './pages/ResetPassword.tsx'
 
@@ -31,6 +32,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/connections" element={<Connections />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/communities" element={<Communities />} />
           <Route path="/settings" element={<Settings />} />

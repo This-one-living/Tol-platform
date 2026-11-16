@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, MessageCircle, Plus, Search, Send, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import './Messages.css'
@@ -49,6 +49,8 @@ const formatTime = (value: string | null) => {
 }
 
 export default function Messages() {
+  const [searchParams] = useSearchParams()
+  const chatTargetId = searchParams.get('with') ?? ''
   const [authStatus, setAuthStatus] = useState<'loading' | 'ready' | 'signed-out' | 'unconfigured' | 'error'>(
     supabase ? 'loading' : 'unconfigured',
   )
@@ -68,6 +70,7 @@ export default function Messages() {
   const [peopleLoading, setPeopleLoading] = useState(false)
   const [peopleSearched, setPeopleSearched] = useState(false)
   const threadEndRef = useRef<HTMLDivElement>(null)
+  const handledChatTargetRef = useRef('')
   const activeConversation = inbox.find((item) => item.other_id === activeOtherId)
   const activeConversationId = activeConversation?.conversation_id ?? ''
 
@@ -95,6 +98,42 @@ export default function Messages() {
   }, [])
 
   const refreshInbox = useCallback(async () => loadInbox(userId), [loadInbox, userId])
+
+  useEffect(() => {
+    if (!supabase || authStatus !== 'ready' || !userId || !chatTargetId) return
+    const client = supabase
+    const requestKey = `${userId}:${chatTargetId}`
+    if (handledChatTargetRef.current === requestKey) return
+    handledChatTargetRef.current = requestKey
+
+    let current = true
+    const openRequestedConversation = async () => {
+      setError('')
+      try {
+        const { data, error: startError } = await client.rpc('start_direct_conversation', {
+          other_user_id: chatTargetId,
+        })
+        if (!current) return
+        if (startError) {
+          setError(startError.message)
+          return
+        }
+        if (typeof data !== 'string') {
+          setError('Could not open this conversation. Please try again.')
+          return
+        }
+
+        setActiveOtherId(chatTargetId)
+        await refreshInbox()
+      } catch (startError) {
+        if (!current) return
+        setError(startError instanceof Error ? startError.message : 'Could not open this conversation.')
+      }
+    }
+
+    void openRequestedConversation()
+    return () => { current = false }
+  }, [authStatus, chatTargetId, refreshInbox, userId])
 
   const markAsRead = useCallback(async (conversationId: string) => {
     if (!supabase || !userId) return
