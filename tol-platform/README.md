@@ -6,6 +6,10 @@ The Messages page uses Supabase Auth, Postgres, and Realtime. Before deploying i
 
 Users must be signed in and have a profile before they can start a conversation. Profile search only returns display name, niche, and community.
 
+## Member discovery setup
+
+Apply [`supabase/migrations/20261116000000_discover_profile_search.sql`](./supabase/migrations/20261116000000_discover_profile_search.sql) to the same Supabase project. It adds an authenticated search function that searches registered profiles by name, skill, and community while excluding the signed-in member.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
