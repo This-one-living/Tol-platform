@@ -1,6 +1,7 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { recordAccountActivity } from '../lib/activity'
 import { EBONYI_LGAS, NICHES, NICHE_CATEGORIES } from '../data/reference'
 import './Settings.css'
 
@@ -24,6 +25,13 @@ type ProfileRecord = Omit<ProfileForm, 'interests' | 'skills'> & {
 
 type PageStatus = 'loading' | 'ready' | 'signed-out' | 'unconfigured' | 'error'
 
+type ActivityRecord = {
+  id: number
+  event_type: string
+  details: { group_type?: string; group_value?: string }
+  created_at: string
+}
+
 const emptyProfile: ProfileForm = {
   full_name: '',
   phone: '',
@@ -38,6 +46,21 @@ const emptyProfile: ProfileForm = {
 
 const listToInput = (values: string[] | null) => values?.join(', ') ?? ''
 const inputToList = (value: string) => value.split(',').map((item) => item.trim()).filter(Boolean)
+
+const activityDescription = (activity: ActivityRecord) => {
+  switch (activity.event_type) {
+    case 'account_created': return 'Created an account'
+    case 'signed_in': return 'Signed in'
+    case 'signed_out': return 'Signed out'
+    case 'password_changed': return 'Changed the account password'
+    case 'password_reset': return 'Reset the account password'
+    case 'profile_updated': return 'Updated profile information'
+    case 'profile_photo_updated': return 'Updated the profile photo'
+    case 'joined_group': return `Joined the ${activity.details.group_type ?? ''} group ${activity.details.group_value ?? ''}`.trim()
+    case 'left_group': return `Left the ${activity.details.group_type ?? ''} group ${activity.details.group_value ?? ''}`.trim()
+    default: return 'Account activity'
+  }
+}
 
 export default function Settings() {
   const [status, setStatus] = useState<PageStatus>(supabase ? 'loading' : 'unconfigured')
@@ -57,8 +80,29 @@ export default function Settings() {
   const [passwordBusy, setPasswordBusy] = useState(false)
   const [passwordError, setPasswordError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState('')
+  const [activities, setActivities] = useState<ActivityRecord[]>([])
+  const [activityLoading, setActivityLoading] = useState(true)
+  const [activityError, setActivityError] = useState('')
   const [logoutBusy, setLogoutBusy] = useState(false)
   const [logoutError, setLogoutError] = useState('')
+
+  const loadActivities = useCallback(async () => {
+    if (!supabase) return
+    const client = supabase
+    try {
+      const { data, error: loadError } = await client.rpc('get_my_activity', { result_limit: 50 })
+      if (loadError) {
+        setActivityError(loadError.message)
+        return
+      }
+      setActivityError('')
+      setActivities((data ?? []) as ActivityRecord[])
+    } catch (loadError) {
+      setActivityError(loadError instanceof Error ? loadError.message : 'Could not load account activity.')
+    } finally {
+      setActivityLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (!photoPreview.startsWith('blob:')) return
@@ -120,6 +164,7 @@ export default function Settings() {
         setPhotoPreview(record.avatar_url ?? '')
         setStatus('ready')
         setProfileLoading(false)
+        void loadActivities()
       } catch (loadError) {
         if (!active) return
         setProfileError(loadError instanceof Error ? loadError.message : 'Could not load your profile.')
@@ -130,7 +175,7 @@ export default function Settings() {
 
     void loadProfile()
     return () => { active = false }
-  }, [])
+  }, [loadActivities])
 
   const setField = (field: keyof ProfileForm) =>
     (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -214,10 +259,16 @@ export default function Settings() {
 
       setAvatarUrl(nextAvatarUrl)
       setPhotoPreview(nextAvatarUrl)
+      const photoChanged = !!photoFile
       setPhotoFile(null)
       if (nextAvatarUrl) localStorage.setItem('tol_profile_photo', nextAvatarUrl)
       localStorage.setItem('tol_user_phone', profile.phone.replace(/\s+/g, ''))
       setProfileSuccess('Your profile has been updated.')
+      const activityErrors = [await recordAccountActivity('profile_updated')]
+      if (photoChanged) activityErrors.push(await recordAccountActivity('profile_photo_updated'))
+      await loadActivities()
+      const activityError = activityErrors.filter(Boolean).join('; ')
+      if (activityError) setActivityError(`Profile saved, but activity could not be recorded: ${activityError}`)
     } catch (saveError) {
       setProfileError(saveError instanceof Error ? saveError.message : 'Could not save your profile.')
     } finally {
@@ -260,6 +311,9 @@ export default function Settings() {
       setNewPassword('')
       setConfirmPassword('')
       setPasswordSuccess('Your password has been changed.')
+      const activityError = await recordAccountActivity('password_changed')
+      await loadActivities()
+      if (activityError) setActivityError(`Password changed, but activity could not be recorded: ${activityError}`)
     } catch (changeError) {
       setPasswordError(changeError instanceof Error ? changeError.message : 'Could not change your password.')
     } finally {
@@ -272,6 +326,8 @@ export default function Settings() {
     setLogoutBusy(true)
     if (supabase) {
       try {
+        const activityError = await recordAccountActivity('signed_out')
+        if (activityError) setLogoutError(`Activity could not be recorded: ${activityError}`)
         const { error: authError } = await supabase.auth.signOut()
         if (authError) {
           setLogoutError(authError.message)
@@ -437,6 +493,29 @@ export default function Settings() {
                 {passwordBusy ? 'Changing password…' : 'Change password'}
               </button>
             </form>
+          </section>
+
+          <section className="card settings-card">
+            <h2>Activity log</h2>
+            <p className="muted">Recent sign-ins, profile and password changes, and group membership activity.</p>
+            {activityError && <p className="error" role="alert">{activityError}</p>}
+            {activityLoading && <p className="muted">Loading activity…</p>}
+            {!activityLoading && !activityError && activities.length === 0 && (
+              <p className="muted">No account activity has been recorded yet.</p>
+            )}
+            {!activityLoading && activities.length > 0 && (
+              <ol className="activity-list">
+                {activities.map((activity) => (
+                  <li key={activity.id} className="activity-item">
+                    <span className="activity-dot" aria-hidden="true" />
+                    <div>
+                      <p>{activityDescription(activity)}</p>
+                      <time dateTime={activity.created_at}>{new Date(activity.created_at).toLocaleString()}</time>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
           </section>
         </>
       )}

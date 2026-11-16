@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { recordAccountActivity } from '../lib/activity'
 
 type RecoveryStatus = 'checking' | 'ready' | 'expired' | 'unavailable'
 
@@ -69,6 +70,7 @@ export default function ResetPassword() {
         return
       }
 
+      const activityError = await recordAccountActivity('password_reset')
       const { error: signOutError } = await supabase.auth.signOut()
       if (signOutError) {
         setError(`Your password was updated, but sign out failed: ${signOutError.message}`)
@@ -77,6 +79,7 @@ export default function ResetPassword() {
 
       localStorage.removeItem('tol_session')
       localStorage.removeItem('tol_profile_complete')
+      if (activityError) setError(`Password reset, but activity could not be recorded: ${activityError}`)
       navigate('/auth', { replace: true })
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Could not reset your password.')

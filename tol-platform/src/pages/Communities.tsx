@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Search, Tag, UsersRound } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { recordAccountActivity } from '../lib/activity'
 import './Communities.css'
 
 type CommunityGroup = {
@@ -105,6 +106,11 @@ export default function Communities() {
           }
         : item,
       ))
+      const activityError = await recordAccountActivity(
+        group.is_member ? 'left_group' : 'joined_group',
+        group.group_id,
+      )
+      if (activityError) setError(`Group updated, but activity could not be recorded: ${activityError}`)
     } catch (membershipError) {
       setError(membershipError instanceof Error ? membershipError.message : 'Could not update group membership.')
     } finally {

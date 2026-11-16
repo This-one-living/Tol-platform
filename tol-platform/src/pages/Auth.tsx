@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { recordAccountActivity } from '../lib/activity'
 
 export default function Auth() {
   const navigate = useNavigate()
@@ -56,6 +57,8 @@ export default function Auth() {
         localStorage.removeItem('tol_user_password')
         localStorage.setItem('tol_profile_complete', 'true')
         localStorage.setItem('tol_session', 'true')
+        const activityError = await recordAccountActivity('signed_in')
+        if (activityError) setError(`Signed in, but activity could not be recorded: ${activityError}`)
         navigate('/home', { replace: true })
       } catch (authError) {
         setError(authError instanceof Error ? authError.message : 'Could not sign in. Please try again.')

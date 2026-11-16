@@ -22,6 +22,10 @@ To create 20 confirmed test accounts with matching Discover profiles, set `SUPAB
 
 Apply [`supabase/migrations/20261116000002_profile_editing.sql`](./supabase/migrations/20261116000002_profile_editing.sql) to add the profile photo column, private profile read/update functions, and the per-user photo upload bucket. Add `https://<your-app-domain>/reset-password` to the Supabase Auth redirect URL allowlist so recovery links can return to the app.
 
+## Account activity log
+
+Apply [`supabase/migrations/20261116000003_account_activity_log.sql`](./supabase/migrations/20261116000003_account_activity_log.sql) to enable the account activity history in Settings. It records successful sign-ins/outs, account creation, profile/password changes, and group membership changes. It does not record message content.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
