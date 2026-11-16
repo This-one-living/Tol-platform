@@ -1,0 +1,80 @@
+.communities-page { display: flex; flex-direction: column; gap: 16px; }
+.communities-heading h1 { margin-bottom: 6px; }
+.communities-heading p { margin-bottom: 0; }
+.communities-eyebrow { color: var(--text-muted); font-size: .875rem; }
+
+.community-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 250px);
+  gap: 12px;
+}
+
+.community-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+.community-search svg { flex: 0 0 auto; }
+.community-search input {
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.community-search input:focus { box-shadow: none; }
+.community-filter select { height: 100%; }
+
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.community-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.community-card-top { display: flex; align-items: center; gap: 9px; }
+.community-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.community-kind {
+  color: var(--text-muted);
+  font-size: .78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.community-card h2 { margin: 0; font-size: 1.1rem; }
+.community-description { min-height: 2.8em; margin: 0; color: var(--text-muted); font-size: .875rem; }
+.community-members { display: flex; align-items: center; gap: 7px; margin: auto 0 0; color: var(--text-muted); font-size: .85rem; }
+.community-members svg { width: 16px; height: 16px; }
+.community-card .btn { margin-top: 3px; }
+.communities-empty { text-align: center; }
+.communities-empty h2 { margin-bottom: 6px; }
+.communities-empty p { margin: 0; }
+.communities-state { display: flex; min-height: 340px; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+.communities-state > svg { color: var(--primary); }
+.communities-state h1 { margin: 0; font-size: 1.6rem; }
+.communities-state p { max-width: 48ch; margin: 0 0 8px; color: var(--text-muted); }
+
+@media (max-width: 640px) {
+  .community-filters { grid-template-columns: 1fr; }
+  .community-filter select { min-height: 44px; }
+}

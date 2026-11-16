@@ -10,6 +10,10 @@ Users must be signed in and have a profile before they can start a conversation.
 
 Apply [`supabase/migrations/20261116000000_discover_profile_search.sql`](./supabase/migrations/20261116000000_discover_profile_search.sql) to the same Supabase project. It adds an authenticated search function that searches registered profiles by name, skill, and community while excluding the signed-in member.
 
+## Built-in communities setup
+
+Apply [`supabase/migrations/20261116000001_builtin_community_groups.sql`](./supabase/migrations/20261116000001_builtin_community_groups.sql) to seed one group per niche and LGA and enable private user memberships, group counts, and join/leave actions.
+
 ## Seeding test accounts
 
 To create 20 confirmed test accounts with matching Discover profiles, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in a local PowerShell session, then run `npm run seed:test-accounts`. The script prints the generated emails and one shared random password. The service-role key is read only by this local script; never add it to frontend `VITE_` variables or commit it.
