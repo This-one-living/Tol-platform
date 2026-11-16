@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import './Messages.css'
 
 type InboxItem = {
+  conversation_id: string
   other_id: string
   full_name: string
   niche: string | null
