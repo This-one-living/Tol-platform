@@ -5,8 +5,7 @@ import { supabase } from '../lib/supabase'
 import './Messages.css'
 
 type InboxItem = {
-  conversation_id: string
-  other_user_id: string
+  other_id: string
   full_name: string
   niche: string | null
   community: string | null
@@ -14,6 +13,10 @@ type InboxItem = {
   last_message_at: string | null
   last_sender_id: string | null
   last_read_at: string
+}
+
+type InboxRpcItem = Omit<InboxItem, 'other_id'> & {
+  other_user_id: string
 }
 
 type Message = {
@@ -50,7 +53,7 @@ export default function Messages() {
   )
   const [userId, setUserId] = useState('')
   const [inbox, setInbox] = useState<InboxItem[]>([])
-  const [activeId, setActiveId] = useState('')
+  const [activeOtherId, setActiveOtherId] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [inboxLoading, setInboxLoading] = useState(true)
   const [loadedThreadId, setLoadedThreadId] = useState('')
@@ -64,6 +67,8 @@ export default function Messages() {
   const [peopleLoading, setPeopleLoading] = useState(false)
   const [peopleSearched, setPeopleSearched] = useState(false)
   const threadEndRef = useRef<HTMLDivElement>(null)
+  const activeConversation = inbox.find((item) => item.other_id === activeOtherId)
+  const activeConversationId = activeConversation?.conversation_id ?? ''
 
   const loadInbox = useCallback(async (accountId: string) => {
     if (!supabase || !accountId) return
@@ -75,9 +80,12 @@ export default function Messages() {
         return
       }
 
-      const rows = (data ?? []) as InboxItem[]
+      const rows = ((data ?? []) as InboxRpcItem[]).map(({ other_user_id, ...item }) => ({
+        ...item,
+        other_id: other_user_id,
+      }))
       setInbox(rows)
-      setActiveId((current) => current || rows[0]?.conversation_id || '')
+      setActiveOtherId((current) => current || rows[0]?.other_id || '')
     } catch (inboxError) {
       setError(inboxError instanceof Error ? inboxError.message : 'Could not load your conversations.')
     } finally {
@@ -147,9 +155,9 @@ export default function Messages() {
         const conversationId = typeof payload.new.conversation_id === 'string' ? payload.new.conversation_id : ''
         if (!conversationId) return
         void refreshInbox().then(() => {
-          if (conversationId === activeId) void markAsRead(conversationId)
+          if (conversationId === activeConversationId) void markAsRead(conversationId)
         })
-        if (conversationId === activeId) {
+        if (conversationId === activeConversationId) {
           void client.from('messages')
             .select('id, conversation_id, sender_id, body, created_at')
             .eq('conversation_id', conversationId)
@@ -166,10 +174,10 @@ export default function Messages() {
       .subscribe()
 
     return () => { void client.removeChannel(channel) }
-  }, [activeId, markAsRead, refreshInbox, userId])
+  }, [activeConversationId, markAsRead, refreshInbox, userId])
 
   useEffect(() => {
-    if (!supabase || !userId || !activeId) return
+    if (!supabase || !userId || !activeConversationId) return
 
     const client = supabase
     let current = true
@@ -177,7 +185,7 @@ export default function Messages() {
       try {
         const { data, error: threadError } = await client.from('messages')
           .select('id, conversation_id, sender_id, body, created_at')
-          .eq('conversation_id', activeId)
+          .eq('conversation_id', activeConversationId)
           .order('created_at', { ascending: true })
           .limit(250)
 
@@ -185,23 +193,23 @@ export default function Messages() {
         if (threadError) {
           setError(threadError.message)
           setMessages([])
-          setLoadedThreadId(activeId)
+          setLoadedThreadId(activeConversationId)
           return
         }
         setMessages((data ?? []) as Message[])
-        setLoadedThreadId(activeId)
-        await markAsRead(activeId)
+        setLoadedThreadId(activeConversationId)
+        await markAsRead(activeConversationId)
       } catch (threadError) {
         if (!current) return
         setError(threadError instanceof Error ? threadError.message : 'Could not load this conversation.')
         setMessages([])
-        setLoadedThreadId(activeId)
+        setLoadedThreadId(activeConversationId)
       }
     }
 
     void loadThread()
     return () => { current = false }
-  }, [activeId, markAsRead, userId])
+  }, [activeConversationId, markAsRead, userId])
 
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -250,7 +258,7 @@ export default function Messages() {
       setPeopleSearch('')
       setPeople([])
       setPeopleSearched(false)
-      setActiveId(data)
+      setActiveOtherId(person.id)
       await refreshInbox()
     } catch (startError) {
       setError(startError instanceof Error ? startError.message : 'Could not open this conversation.')
@@ -260,13 +268,13 @@ export default function Messages() {
   const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const body = draft.trim()
-    if (!supabase || !userId || !activeId || !body || sending) return
+    if (!supabase || !userId || !activeConversationId || !body || sending) return
     const client = supabase
     setError('')
     setSending(true)
     try {
       const { error: sendError } = await client.from('messages').insert({
-        conversation_id: activeId,
+        conversation_id: activeConversationId,
         sender_id: userId,
         body,
       })
@@ -278,7 +286,7 @@ export default function Messages() {
       await refreshInbox()
       const { data, error: threadError } = await client.from('messages')
         .select('id, conversation_id, sender_id, body, created_at')
-        .eq('conversation_id', activeId)
+        .eq('conversation_id', activeConversationId)
         .order('created_at', { ascending: true })
         .limit(250)
       if (threadError) setError(threadError.message)
@@ -297,8 +305,8 @@ export default function Messages() {
     }
   }
 
-  const activeConversation = inbox.find((item) => item.conversation_id === activeId)
-  const threadLoading = !!activeId && loadedThreadId !== activeId
+  const threadLoading = !!activeOtherId
+    && (!activeConversation || loadedThreadId !== activeConversationId)
   const visibleInbox = inbox.filter((item) =>
     item.full_name.toLowerCase().includes(inboxFilter.toLowerCase().trim()),
   )
@@ -348,7 +356,7 @@ export default function Messages() {
       {error && <p className="alert alert-error messages-alert" role="alert">{error}</p>}
 
       <div className="messenger">
-        <aside className={`conversation-list${activeId ? ' message-pane-mobile-hidden' : ''}`} aria-label="Conversations">
+        <aside className={`conversation-list${activeOtherId ? ' message-pane-mobile-hidden' : ''}`} aria-label="Conversations">
           {composeOpen && (
             <section className="compose-panel">
               <form className="compose-search" onSubmit={handleSearchPeople}>
@@ -416,10 +424,10 @@ export default function Messages() {
                 && new Date(item.last_message_at) > new Date(item.last_read_at)
               return (
                 <button
-                  className={`conversation-item${activeId === item.conversation_id ? ' conversation-item-active' : ''}`}
-                  key={item.conversation_id}
+                  className={`conversation-item${activeOtherId === item.other_id ? ' conversation-item-active' : ''}`}
+                  key={item.other_id}
                   type="button"
-                  onClick={() => setActiveId(item.conversation_id)}
+                  onClick={() => setActiveOtherId(item.other_id)}
                 >
                   <span className="message-avatar">{initials(item.full_name)}</span>
                   <span className="conversation-copy">
@@ -438,11 +446,11 @@ export default function Messages() {
           </div>
         </aside>
 
-        <section className={`conversation-thread${!activeId ? ' message-pane-mobile-hidden' : ''}`} aria-label="Chat">
-          {activeId ? (
+        <section className={`conversation-thread${!activeOtherId ? ' message-pane-mobile-hidden' : ''}`} aria-label="Chat">
+          {activeOtherId ? (
             <>
               <header className="thread-header">
-                <button className="thread-back" type="button" onClick={() => setActiveId('')} aria-label="Back to conversations">
+                <button className="thread-back" type="button" onClick={() => setActiveOtherId('')} aria-label="Back to conversations">
                   <ArrowLeft size={20} />
                 </button>
                 <span className="message-avatar">{initials(activeConversation?.full_name || 'TOL member')}</span>
