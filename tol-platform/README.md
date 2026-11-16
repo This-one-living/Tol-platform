@@ -10,6 +10,10 @@ Users must be signed in and have a profile before they can start a conversation.
 
 Apply [`supabase/migrations/20261116000000_discover_profile_search.sql`](./supabase/migrations/20261116000000_discover_profile_search.sql) to the same Supabase project. It adds an authenticated search function that searches registered profiles by name, skill, and community while excluding the signed-in member.
 
+## Seeding test accounts
+
+To create 20 confirmed test accounts with matching Discover profiles, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in a local PowerShell session, then run `npm run seed:test-accounts`. The script prints the generated emails and one shared random password. The service-role key is read only by this local script; never add it to frontend `VITE_` variables or commit it.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
