@@ -2,6 +2,10 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Discover and network requests
+
+Apply [`src/lib/supabase/migrations/005-discover-network-requests.sql`](./src/lib/supabase/migrations/005-discover-network-requests.sql) after `001-core-schema.sql`. It adds the authenticated Discover profile search and incoming network-request functions used by the Discover page.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
