@@ -17,6 +17,15 @@ type DiscoverProfile = {
   skills: string[]
 }
 
+type NetworkRequest = {
+  request_id: string
+  requester_id: string
+  full_name: string
+  niche: string | null
+  lga: string | null
+  created_at: string
+}
+
 type PageStatus = 'loading' | 'ready' | 'signed-out' | 'unconfigured' | 'error'
 
 const initials = (name: string) =>
@@ -33,6 +42,9 @@ export default function Discover() {
   const [error, setError] = useState('')
   const [requestError, setRequestError] = useState('')
   const [requestBusyId, setRequestBusyId] = useState('')
+  const [incomingRequests, setIncomingRequests] = useState<NetworkRequest[]>([])
+  const [incomingRequestsLoading, setIncomingRequestsLoading] = useState(false)
+  const [incomingRequestsError, setIncomingRequestsError] = useState('')
 
   useEffect(() => {
     if (!supabase) return
@@ -62,6 +74,36 @@ export default function Discover() {
     void loadUser()
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    if (!supabase || status !== 'ready' || !userId) return
+    let active = true
+    const client = supabase
+
+    const loadIncomingRequests = async () => {
+      setIncomingRequestsLoading(true)
+      setIncomingRequestsError('')
+      try {
+        const { data, error: requestsError } = await client.rpc('get_my_network_requests')
+        if (!active) return
+        if (requestsError) {
+          setIncomingRequestsError(requestsError.message)
+          return
+        }
+        setIncomingRequests((data ?? []) as NetworkRequest[])
+      } catch (requestsError) {
+        if (!active) return
+        setIncomingRequestsError(
+          requestsError instanceof Error ? requestsError.message : 'Could not load network requests.',
+        )
+      } finally {
+        if (active) setIncomingRequestsLoading(false)
+      }
+    }
+
+    void loadIncomingRequests()
+    return () => { active = false }
+  }, [status, userId])
 
   useEffect(() => {
     if (!supabase || status !== 'ready' || !userId) return
@@ -148,6 +190,45 @@ export default function Discover() {
           Complete profile
         </Link>
       </div>
+
+      {status === 'ready' && (
+        <section className="discover-requests" aria-labelledby="discover-requests-title">
+          <div className="discover-requests-heading">
+            <div>
+              <p className="discover-requests-eyebrow">YOUR NETWORK</p>
+              <h2 id="discover-requests-title">Network requests</h2>
+              <p className="muted">People who want to connect with you.</p>
+            </div>
+            <Link to="/connections" className="btn btn-secondary btn-sm">
+              Review requests
+            </Link>
+          </div>
+
+          {incomingRequestsLoading && <p className="muted" role="status">Loading network requests…</p>}
+          {incomingRequestsError && <p className="alert alert-error" role="alert">{incomingRequestsError}</p>}
+          {!incomingRequestsLoading && !incomingRequestsError && incomingRequests.length === 0 && (
+            <p className="discover-requests-empty">You don’t have any pending network requests.</p>
+          )}
+          {!incomingRequestsLoading && !incomingRequestsError && incomingRequests.length > 0 && (
+            <div className="discover-request-list">
+              {incomingRequests.map((request) => (
+                <article className="discover-request-card" key={request.request_id}>
+                  <div className="avatar">{initials(request.full_name)}</div>
+                  <div className="discover-request-copy">
+                    <strong>{request.full_name}</strong>
+                    <span className="person-meta">
+                      {[request.niche, request.lga].filter(Boolean).join(' · ') || 'TOL member'}
+                    </span>
+                  </div>
+                  <Link to="/connections" className="discover-request-review">
+                    Review
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <div className="filters">
         <input
