@@ -10,6 +10,17 @@
   letter-spacing: .12em;
 }
 
+.network-requests { display: grid; gap: 12px; }
+.network-requests .section-head { margin: 0; }
+.network-request-count { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: .78rem; font-weight: 700; }
+.network-request-list { display: grid; gap: 10px; }
+.network-request-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.network-request-card h3 { margin: 0 0 4px; color: #23344c; }
+.network-request-card .person-meta { margin: 0; }
+.network-request-actions { display: flex; flex: 0 0 auto; gap: 8px; }
+.network-request-actions .btn { min-width: 98px; }
+.network-request-actions svg { width: 16px; height: 16px; }
+
 .connections-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -96,4 +107,6 @@
 @media (max-width: 520px) {
   .connections-grid { grid-template-columns: 1fr; }
   .connection-card { padding: 17px; }
+  .network-request-card { align-items: stretch; flex-direction: column; }
+  .network-request-actions .btn { flex: 1; }
 }

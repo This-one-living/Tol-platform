@@ -10,6 +10,8 @@ Users must be signed in and have a profile before they can start a conversation.
 
 Apply [`supabase/migrations/20261116000004_connections.sql`](./supabase/migrations/20261116000004_connections.sql) after the core schema. The Connections page lists accepted network connections and returns their phone number only to the connected member. Opening a profile shows its details; Chat opens that person's conversation in Messages.
 
+Apply [`supabase/migrations/20261116000005_network_requests.sql`](./supabase/migrations/20261116000005_network_requests.sql) after the member-discovery migration to enable Add to network requests in Discover and incoming accept/decline actions on the Connections page.
+
 ## Member discovery setup
 
 Apply [`supabase/migrations/20261116000000_discover_profile_search.sql`](./supabase/migrations/20261116000000_discover_profile_search.sql) to the same Supabase project. It adds an authenticated search function that searches registered profiles by name, skill, and community while excluding the signed-in member.

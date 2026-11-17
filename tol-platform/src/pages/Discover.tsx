@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, UserPlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { EBONYI_LGAS, NICHES } from '../data/reference'
 import './Discover.css'
 
 type DiscoverProfile = {
   profile_id: string
+  network_status: 'none' | 'request_sent' | 'request_received' | 'connected'
   full_name: string
   niche: string | null
   category: string | null
@@ -30,6 +31,8 @@ export default function Discover() {
   const [profiles, setProfiles] = useState<DiscoverProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [requestError, setRequestError] = useState('')
+  const [requestBusyId, setRequestBusyId] = useState('')
 
   useEffect(() => {
     if (!supabase) return
@@ -111,6 +114,29 @@ export default function Discover() {
     setError('')
   }
 
+  const addToNetwork = async (profileId: string) => {
+    if (!supabase || requestBusyId) return
+    const client = supabase
+    setRequestBusyId(profileId)
+    setRequestError('')
+    try {
+      const { error: requestError } = await client.rpc('send_network_request', {
+        p_recipient: profileId,
+      })
+      if (requestError) {
+        setRequestError(requestError.message)
+        return
+      }
+      setProfiles((current) => current.map((profile) =>
+        profile.profile_id === profileId ? { ...profile, network_status: 'request_sent' } : profile,
+      ))
+    } catch (requestError) {
+      setRequestError(requestError instanceof Error ? requestError.message : 'Could not send this network request.')
+    } finally {
+      setRequestBusyId('')
+    }
+  }
+
   return (
     <>
       <div className="topbar">
@@ -151,6 +177,7 @@ export default function Discover() {
       )}
       {status === 'error' && <p className="alert alert-error" role="alert">{error}</p>}
       {status === 'ready' && error && <p className="alert alert-error" role="alert">{error}</p>}
+      {requestError && <p className="alert alert-error" role="alert">{requestError}</p>}
 
       {status === 'ready' && (
         <>
@@ -187,6 +214,32 @@ export default function Discover() {
                     )}
                   </div>
                   <div className="person-card-actions">
+                    {profile.network_status === 'none' && (
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        type="button"
+                        disabled={!!requestBusyId}
+                        onClick={() => void addToNetwork(profile.profile_id)}
+                      >
+                        <UserPlus size={16} />
+                        {requestBusyId === profile.profile_id ? 'Sending…' : 'Add to network'}
+                      </button>
+                    )}
+                    {profile.network_status === 'request_sent' && (
+                      <button className="btn btn-secondary btn-sm" type="button" disabled>
+                        Request sent
+                      </button>
+                    )}
+                    {profile.network_status === 'request_received' && (
+                      <Link className="btn btn-secondary btn-sm" to="/connections">
+                        Review request
+                      </Link>
+                    )}
+                    {profile.network_status === 'connected' && (
+                      <Link className="btn btn-secondary btn-sm" to="/connections">
+                        In your network
+                      </Link>
+                    )}
                     <Link
                       className="btn btn-primary btn-sm"
                       to={`/messages?with=${encodeURIComponent(profile.profile_id)}`}
