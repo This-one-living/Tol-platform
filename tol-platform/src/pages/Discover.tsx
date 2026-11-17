@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { MessageCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { EBONYI_LGAS, NICHES } from '../data/reference'
+import './Discover.css'
 
 type DiscoverProfile = {
   profile_id: string
@@ -183,6 +185,15 @@ export default function Discover() {
                         {profile.skills.map((skill) => <span key={skill} className="tag">{skill}</span>)}
                       </div>
                     )}
+                  </div>
+                  <div className="person-card-actions">
+                    <Link
+                      className="btn btn-primary btn-sm"
+                      to={`/messages?with=${encodeURIComponent(profile.profile_id)}`}
+                    >
+                      <MessageCircle size={16} />
+                      Chat
+                    </Link>
                   </div>
                 </article>
               )
