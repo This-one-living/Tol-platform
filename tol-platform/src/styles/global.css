@@ -21,7 +21,6 @@
   --radius-lg: 18px;
   --shadow: 0 1px 2px rgba(91, 33, 182, 0.06), 0 4px 14px rgba(91, 33, 182, 0.06);
 
-  --sidebar-w: 248px;
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -62,42 +61,75 @@ a:hover { color: var(--primary-hover); }
 
 /* ---------- App shell ---------- */
 .app-shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+.site-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px clamp(16px, 3vw, 40px);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .main {
   padding: 28px clamp(16px, 3vw, 40px) 48px;
   max-width: 1200px;
   width: 100%;
+  margin: 0 auto;
 }
 
-/* ---------- Sidebar ---------- */
-.sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+/* ---------- Navigation dropdown ---------- */
+.navigation-dropdown { position: relative; }
+
+.navigation-toggle {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 24px 16px;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
+.navigation-toggle:hover { background: var(--bg); }
+.navigation-toggle svg { width: 18px; height: 18px; }
+.navigation-toggle svg:last-child { width: 16px; height: 16px; transition: transform 0.15s; }
+.navigation-toggle .navigation-chevron-open { transform: rotate(180deg); }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px;
   font-weight: 700;
   font-size: 1.125rem;
   color: var(--primary);
   text-decoration: none;
 }
 
-.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  width: min(250px, calc(100vw - 32px));
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
 
 .nav a,
 .nav button {
@@ -140,8 +172,6 @@ a:hover { color: var(--primary-hover); }
   line-height: 20px;
   text-align: center;
 }
-
-.sidebar-footer { margin-top: auto; }
 
 /* ---------- Top bar ---------- */
 .topbar {
@@ -365,60 +395,9 @@ textarea:focus {
     overflow-x: hidden;
   }
 
-  .app-shell { grid-template-columns: 1fr; }
-
-  .sidebar {
-    position: fixed;
-    inset: 0 0 0 auto;
-    width: 68px;
-    height: 100dvh;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0;
-    overflow-y: auto;
-    padding:
-      max(8px, env(safe-area-inset-top))
-      4px
-      max(8px, env(safe-area-inset-bottom));
-    border-right: 0;
-    border-left: 1px solid var(--border);
-    z-index: 20;
-  }
-
-  .sidebar .brand,
-  .sidebar-footer { display: none; }
-
-  .nav {
-    flex-direction: column;
-    width: 100%;
-    gap: 2px;
-  }
-
-  .nav a, .nav button {
-    position: relative;
-    width: 60px;
-    min-height: 58px;
-    flex-direction: column;
-    gap: 2px;
-    justify-content: center;
-    padding: 5px 2px;
-    font-size: 0.625rem;
-    line-height: 1.15;
-    text-align: center;
-  }
-
-  .nav-badge {
-    position: absolute;
-    top: 2px;
-    right: 7px;
-    min-width: 18px;
-    padding: 0 4px;
-    line-height: 18px;
-  }
-
   .main {
     max-width: 100%;
-    padding: 20px 84px 32px 16px;
+    padding: 20px 16px 32px;
   }
 }
 

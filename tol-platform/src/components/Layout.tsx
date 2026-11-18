@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import {
   Home,
@@ -9,6 +9,8 @@ import {
   UsersRound,
   Coins,
   Settings,
+  Menu as MenuIcon,
+  ChevronDown,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -26,6 +28,28 @@ const links = [
 export default function Layout() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [notificationCountError, setNotificationCountError] = useState(false)
+  const [navigationOpen, setNavigationOpen] = useState(false)
+  const navigationRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!navigationOpen) return
+
+    const closeNavigation = (event: PointerEvent) => {
+      if (event.target instanceof Node && !navigationRef.current?.contains(event.target)) {
+        setNavigationOpen(false)
+      }
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setNavigationOpen(false)
+    }
+
+    document.addEventListener('pointerdown', closeNavigation)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', closeNavigation)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [navigationOpen])
 
   useEffect(() => {
     if (!supabase) return
@@ -89,29 +113,45 @@ export default function Layout() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <header className="site-header">
         <NavLink to="/home" className="brand">
           This One Living
         </NavLink>
-        <nav className="nav">
-          {links.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) => (isActive ? 'active' : '')}
-            >
-              <Icon />
-              {label}
-              {to === '/notifications' && (unreadCount > 0 || notificationCountError) && (
-                <span className="nav-badge" aria-label={notificationCountError ? 'Unread notifications unavailable' : `${unreadCount} unread notifications`}>
-                  {notificationCountError ? '!' : unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
+        <div className="navigation-dropdown" ref={navigationRef}>
+          <button
+            className="navigation-toggle"
+            type="button"
+            aria-expanded={navigationOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setNavigationOpen((open) => !open)}
+          >
+            <MenuIcon aria-hidden="true" />
+            <span>Menu</span>
+            <ChevronDown className={navigationOpen ? 'navigation-chevron-open' : ''} aria-hidden="true" />
+          </button>
+          {navigationOpen && (
+            <nav className="nav" id="primary-navigation" aria-label="Main navigation">
+              {links.map(({ to, label, icon: Icon, end }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  className={({ isActive }) => (isActive ? 'active' : '')}
+                  onClick={() => setNavigationOpen(false)}
+                >
+                  <Icon />
+                  {label}
+                  {to === '/notifications' && (unreadCount > 0 || notificationCountError) && (
+                    <span className="nav-badge" aria-label={notificationCountError ? 'Unread notifications unavailable' : `${unreadCount} unread notifications`}>
+                      {notificationCountError ? '!' : unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+            </nav>
+          )}
+        </div>
+      </header>
       <main className="main">
         <Outlet />
       </main>
