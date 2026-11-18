@@ -2,6 +2,12 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
+const getPasswordResetRedirectUrl = () => {
+  const isLocalDevelopment = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+  const origin = isLocalDevelopment ? window.location.origin : 'https://thisoneliving.com'
+  return new URL('/reset-password', origin).toString()
+}
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
@@ -19,13 +25,13 @@ export default function ForgotPassword() {
     setBusy(true)
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: new URL('/reset-password', window.location.origin).toString(),
+        redirectTo: getPasswordResetRedirectUrl(),
       })
       if (resetError) {
         const message = resetError.message
         setError(
           /redirect|url.*not allowed/i.test(message)
-            ? 'The reset link redirect is not allowed by Supabase. Add this app’s reset-password URL to the Supabase Auth redirect URL allowlist, including your localhost URL during development.'
+            ? 'Supabase is not allowing this reset link destination. Set the Supabase Site URL to https://thisoneliving.com and add https://thisoneliving.com/reset-password to the Auth redirect URL allowlist. For local development, also allow your localhost reset-password URL.'
             : message,
         )
       } else {
