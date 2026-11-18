@@ -358,32 +358,68 @@ textarea:focus {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   .app-shell { grid-template-columns: 1fr; }
 
   .sidebar {
     position: fixed;
-    inset: auto 0 0 0;
-    height: auto;
-    flex-direction: row;
-    padding: 6px 8px;
+    inset: 0 0 0 auto;
+    width: 68px;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    overflow-y: auto;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      4px
+      max(8px, env(safe-area-inset-bottom));
     border-right: 0;
-    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     z-index: 20;
   }
 
   .sidebar .brand,
   .sidebar-footer { display: none; }
 
-  .nav { flex-direction: row; width: 100%; justify-content: space-around; }
+  .nav {
+    flex-direction: column;
+    width: 100%;
+    gap: 2px;
+  }
+
   .nav a, .nav button {
+    position: relative;
+    width: 60px;
+    min-height: 58px;
     flex-direction: column;
     gap: 2px;
-    padding: 6px 4px;
-    font-size: 0.6875rem;
+    justify-content: center;
+    padding: 5px 2px;
+    font-size: 0.625rem;
+    line-height: 1.15;
     text-align: center;
   }
 
-  .main { padding-bottom: 96px; }
+  .nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 7px;
+    min-width: 18px;
+    padding: 0 4px;
+    line-height: 18px;
+  }
+
+  .main {
+    max-width: 100%;
+    padding: 20px 84px 32px 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
