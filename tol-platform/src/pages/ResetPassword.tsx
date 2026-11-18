@@ -4,6 +4,15 @@ import { supabase } from '../lib/supabase'
 import { recordAccountActivity } from '../lib/activity'
 
 type RecoveryStatus = 'checking' | 'ready' | 'expired' | 'unavailable'
+const recoveryMarkerKey = 'tol_password_recovery'
+
+const hasRecoveryMarker = () => {
+  try {
+    return sessionStorage.getItem(recoveryMarkerKey) === 'true'
+  } catch {
+    return false
+  }
+}
 
 export default function ResetPassword() {
   const navigate = useNavigate()
@@ -19,7 +28,15 @@ export default function ResetPassword() {
     const client = supabase
     const { data: { subscription } } = client.auth.onAuthStateChange((event, session) => {
       if (!active) return
-      if (event === 'PASSWORD_RECOVERY' || session) setStatus('ready')
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        try {
+          sessionStorage.setItem(recoveryMarkerKey, 'true')
+          setStatus('ready')
+        } catch {
+          setError('Could not validate this reset session in your browser. Please open the reset link again.')
+          setStatus('expired')
+        }
+      }
     })
 
     const checkSession = async () => {
@@ -29,8 +46,11 @@ export default function ResetPassword() {
         if (sessionError) {
           setError(sessionError.message)
           setStatus('expired')
+        } else if (data.session && hasRecoveryMarker()) {
+          setStatus('ready')
         } else {
-          setStatus(data.session ? 'ready' : 'expired')
+          sessionStorage.removeItem(recoveryMarkerKey)
+          setStatus('expired')
         }
       } catch (sessionError) {
         if (!active) return
@@ -70,6 +90,7 @@ export default function ResetPassword() {
         return
       }
 
+      sessionStorage.removeItem(recoveryMarkerKey)
       const activityError = await recordAccountActivity('password_reset')
       const { error: signOutError } = await supabase.auth.signOut()
       if (signOutError) {

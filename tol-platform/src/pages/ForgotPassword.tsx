@@ -19,10 +19,15 @@ export default function ForgotPassword() {
     setBusy(true)
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: new URL('/reset-password', window.location.origin).toString(),
       })
       if (resetError) {
-        setError(resetError.message)
+        const message = resetError.message
+        setError(
+          /redirect|url.*not allowed/i.test(message)
+            ? 'The reset link redirect is not allowed by Supabase. Add this app’s reset-password URL to the Supabase Auth redirect URL allowlist, including your localhost URL during development.'
+            : message,
+        )
       } else {
         setSent(true)
       }

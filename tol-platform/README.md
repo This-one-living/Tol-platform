@@ -26,7 +26,7 @@ To create 20 confirmed test accounts with matching Discover profiles, set `SUPAB
 
 ## Profile editing and password recovery
 
-Apply [`supabase/migrations/20261116000002_profile_editing.sql`](./supabase/migrations/20261116000002_profile_editing.sql) to add the profile photo column, private profile read/update functions, and the per-user photo upload bucket. Add `https://<your-app-domain>/reset-password` to the Supabase Auth redirect URL allowlist so recovery links can return to the app.
+Apply [`supabase/migrations/20261116000002_profile_editing.sql`](./supabase/migrations/20261116000002_profile_editing.sql) to add the profile photo column, private profile read/update functions, and the per-user photo upload bucket. Add `https://<your-app-domain>/reset-password` to the Supabase Auth redirect URL allowlist so recovery links can return to the app. For local development, also allow the exact Vite callback URL, usually `http://localhost:5173/reset-password` (and the equivalent `http://127.0.0.1:5173/reset-password` if you use that host). The forgot-password page uses the current app origin, so any custom development port must be allowlisted too.
 
 ## Account activity log
 
