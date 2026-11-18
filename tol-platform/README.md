@@ -34,6 +34,12 @@ Apply [`supabase/migrations/20261116000003_account_activity_log.sql`](./supabase
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## TOL Coins, social feed, and Marketplace
+
+Apply [`src/lib/supabase/migrations/005-social-marketplace-rewards.sql`](./src/lib/supabase/migrations/005-social-marketplace-rewards.sql) after migrations `001` through `004`. The TOL Coin page uses an append-only ledger and awards one TOL Coin per Lagos-local day only after an admin approves all seven daily activity submissions. The former message-per-minute award is disabled for new messages; historical ledger entries and balances remain intact. TOL Coins are not redeemable, and the displayed naira amount is reference-only.
+
+The Home feed supports text posts, likes, comments, and sharing. Marketplace supports product and service listings and lets members contact sellers through Messages; it does not process payments.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

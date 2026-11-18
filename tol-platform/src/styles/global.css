@@ -2,16 +2,16 @@
 
 /* ---------- Tokens ---------- */
 :root {
-  --primary: #174ea6;
-  --primary-hover: #123d82;
-  --primary-soft: #e8f0fe;
-  --primary-border: #c6d8f8;
+  --primary: #6b21a8;
+  --primary-hover: #581c87;
+  --primary-soft: #f3e8ff;
+  --primary-border: #d8b4fe;
 
-  --bg: #f5f7fb;
+  --bg: #fbfaff;
   --surface: #ffffff;
-  --text: #1b2433;
-  --text-muted: #5b6678;
-  --border: #e1e6ef;
+  --text: #111111;
+  --text-muted: #5b5562;
+  --border: #e7e0ed;
 
   --success: #1e8e3e;
   --danger: #c5221f;
@@ -19,7 +19,7 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
-  --shadow: 0 1px 2px rgba(23, 78, 166, 0.06), 0 4px 14px rgba(23, 78, 166, 0.06);
+  --shadow: 0 1px 2px rgba(91, 33, 182, 0.06), 0 4px 14px rgba(91, 33, 182, 0.06);
 
   --sidebar-w: 248px;
   --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

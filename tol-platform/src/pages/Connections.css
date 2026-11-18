@@ -15,7 +15,7 @@
 .network-request-count { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: .78rem; font-weight: 700; }
 .network-request-list { display: grid; gap: 10px; }
 .network-request-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-.network-request-card h3 { margin: 0 0 4px; color: #23344c; }
+.network-request-card h3 { margin: 0 0 4px; color: var(--text); }
 .network-request-card .person-meta { margin: 0; }
 .network-request-actions { display: flex; flex: 0 0 auto; gap: 8px; }
 .network-request-actions .btn { min-width: 98px; }
@@ -43,13 +43,13 @@
 .connection-card:hover {
   transform: translateY(-2px);
   border-color: var(--primary-border);
-  box-shadow: 0 8px 22px rgba(23, 78, 166, .1);
+  box-shadow: 0 8px 22px rgba(107, 33, 168, .1);
 }
 
 .connection-card:focus-visible { outline: 3px solid var(--primary-border); outline-offset: 3px; }
 .connection-card > svg { flex: 0 0 auto; color: var(--primary); }
 .connection-card-copy { display: grid; min-width: 0; gap: 5px; }
-.connection-card-copy strong { overflow: hidden; color: #23344c; text-overflow: ellipsis; white-space: nowrap; }
+.connection-card-copy strong { overflow: hidden; color: var(--text); text-overflow: ellipsis; white-space: nowrap; }
 .connection-card-copy span { overflow: hidden; color: var(--text-muted); font-size: .84rem; text-overflow: ellipsis; white-space: nowrap; }
 
 .connections-empty { display: grid; justify-items: center; gap: 10px; padding: 48px 24px; text-align: center; }
@@ -72,13 +72,13 @@
 }
 
 .connection-dialog::backdrop {
-  background: rgba(15, 27, 44, .32);
+  background: rgba(17, 17, 17, .32);
   backdrop-filter: blur(5px);
 }
 
 .connection-dialog-content { padding: clamp(24px, 5vw, 36px); }
 .connection-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
-.connection-dialog-heading h2 { margin: 0; color: #1b2c45; font-size: 1.55rem; }
+.connection-dialog-heading h2 { margin: 0; color: var(--text); font-size: 1.55rem; }
 .connection-dialog-close {
   display: grid;
   width: 36px;
@@ -97,7 +97,7 @@
 .connection-details > div { padding: 13px 0; border-bottom: 1px solid var(--border); }
 .connection-details > div:first-child { border-top: 1px solid var(--border); }
 .connection-details dt { margin-bottom: 4px; color: var(--text-muted); font-size: .76rem; font-weight: 600; }
-.connection-details dd { margin: 0; color: #26364d; font-size: .95rem; line-height: 1.55; overflow-wrap: anywhere; }
+.connection-details dd { margin: 0; color: var(--text); font-size: .95rem; line-height: 1.55; overflow-wrap: anywhere; }
 .connection-details a { color: var(--primary); font-weight: 600; text-decoration: none; }
 .connection-details a:hover { text-decoration: underline; }
 

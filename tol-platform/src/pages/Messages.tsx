@@ -496,7 +496,7 @@ export default function Messages() {
                 <span className="message-avatar">{initials(activeConversation?.full_name || 'TOL member')}</span>
                 <div className="thread-person">
                   <h2>{activeConversation?.full_name || 'Conversation'}</h2>
-                  <p>{[activeConversation?.niche, activeConversation?.community].filter(Boolean).join(' · ') || 'The One Living'}</p>
+                  <p>{[activeConversation?.niche, activeConversation?.community].filter(Boolean).join(' · ') || 'This One Living'}</p>
                 </div>
               </header>
 

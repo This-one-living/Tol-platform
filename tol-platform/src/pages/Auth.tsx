@@ -99,9 +99,9 @@ export default function Auth() {
   return (
     <main className="login-page">
       <header className="login-topbar">
-        <Link className="login-brand" to="/auth" aria-label="The One Living home">
+        <Link className="login-brand" to="/auth" aria-label="This One Living home">
           <span className="login-brand-mark">T</span>
-          <span>The One Living</span>
+          <span>This One Living</span>
         </Link>
         <p>New to TOL? <Link to="/signup">Create an account</Link></p>
       </header>
@@ -193,7 +193,7 @@ export default function Auth() {
           <p className="login-eyebrow">A COMMUNITY THAT MOVES WITH YOU</p>
           <h2 id="login-about-title">Your next opportunity could be just one connection away.</h2>
           <p>
-            The One Living brings people and ideas together, helping you discover
+            This One Living brings people and ideas together, helping you discover
             local talent, build meaningful relationships, and create new possibilities.
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function Auth() {
       </section>
 
       <footer className="login-footer">
-        <span>The One Living</span>
+        <span>This One Living</span>
         <span>Connecting people. Creating possibilities.</span>
       </footer>
     </main>

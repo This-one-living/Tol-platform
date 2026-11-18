@@ -27,7 +27,7 @@
 
 .discover-requests-heading h2 {
   margin: 0 0 4px;
-  color: #23344c;
+  color: var(--text);
   font-size: 1.15rem;
 }
 
@@ -84,7 +84,7 @@
 
 .discover-request-copy strong {
   overflow: hidden;
-  color: #23344c;
+  color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

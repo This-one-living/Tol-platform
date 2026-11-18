@@ -132,7 +132,7 @@ export default function Connections() {
         <div>
           <p className="connections-eyebrow">YOUR NETWORK</p>
           <h1>Connections</h1>
-          <p className="muted">People you’ve connected with in The One Living.</p>
+          <p className="muted">People you’ve connected with in This One Living.</p>
         </div>
       </header>
 

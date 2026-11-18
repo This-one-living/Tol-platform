@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { MessageCircle, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { EBONYI_LGAS, NICHES } from '../data/reference'
 import './Discover.css'
@@ -45,6 +45,7 @@ export default function Discover() {
   const [incomingRequests, setIncomingRequests] = useState<NetworkRequest[]>([])
   const [incomingRequestsLoading, setIncomingRequestsLoading] = useState(false)
   const [incomingRequestsError, setIncomingRequestsError] = useState('')
+  const discoverProfiles = profiles.filter((profile) => profile.network_status !== 'request_received')
 
   useEffect(() => {
     if (!supabase) return
@@ -263,11 +264,11 @@ export default function Discover() {
       {status === 'ready' && (
         <>
           <p className="muted" aria-live="polite">
-            {loading ? 'Searching members…' : `${profiles.length} ${profiles.length === 1 ? 'member' : 'members'} found`}
+            {loading ? 'Searching members…' : `${discoverProfiles.length} ${discoverProfiles.length === 1 ? 'member' : 'members'} found`}
           </p>
-          {!loading && profiles.length === 0 && (
+          {!loading && discoverProfiles.length === 0 && (
             <div className="card">
-              <h2>No members found</h2>
+              <h2>No other members found</h2>
               <p className="muted">
                 {search.trim()
                   ? `No members match “${search.trim()}”. Try another name, skill, or community.`
@@ -275,10 +276,10 @@ export default function Discover() {
               </p>
             </div>
           )}
-          {loading && profiles.length === 0 && <p className="muted">Loading member profiles…</p>}
+          {loading && discoverProfiles.length === 0 && <p className="muted">Loading member profiles…</p>}
 
           <div className="people-grid">
-            {!loading && profiles.map((profile) => {
+            {!loading && discoverProfiles.map((profile) => {
               const role = profile.category || profile.other_niche || profile.niche || 'TOL member'
               const location = [profile.community, profile.lga].filter(Boolean).join(' · ')
               return (
@@ -311,23 +312,11 @@ export default function Discover() {
                         Request sent
                       </button>
                     )}
-                    {profile.network_status === 'request_received' && (
-                      <Link className="btn btn-secondary btn-sm" to="/connections">
-                        Review request
-                      </Link>
-                    )}
                     {profile.network_status === 'connected' && (
-                      <Link className="btn btn-secondary btn-sm" to="/connections">
+                      <button className="btn btn-secondary btn-sm" type="button" disabled>
                         In your network
-                      </Link>
+                      </button>
                     )}
-                    <Link
-                      className="btn btn-primary btn-sm"
-                      to={`/messages?with=${encodeURIComponent(profile.profile_id)}`}
-                    >
-                      <MessageCircle size={16} />
-                      Chat
-                    </Link>
                   </div>
                 </article>
               )
