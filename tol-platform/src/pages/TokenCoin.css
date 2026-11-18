@@ -267,147 +267,6 @@
   font-size: .86rem;
 }
 
-.token-tasks,
-.token-admin {
-  padding: 0;
-  overflow: hidden;
-}
-
-.token-task-list,
-.token-admin-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.token-task {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  padding: 13px 22px;
-  border-top: 1px solid var(--border);
-}
-
-.token-task-status {
-  display: grid;
-  width: 23px;
-  height: 23px;
-  flex: 0 0 23px;
-  place-items: center;
-  margin-top: 1px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  color: var(--text-muted);
-}
-
-.token-task-approved {
-  border-color: var(--success);
-  background: var(--success);
-  color: #fff;
-}
-
-.token-task-pending {
-  border-color: var(--primary-border);
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-
-.token-task-rejected {
-  border-color: var(--danger);
-  background: #fce8e6;
-  color: var(--danger);
-}
-
-.token-task-copy {
-  display: grid;
-  min-width: 0;
-  gap: 3px;
-}
-
-.token-task-copy strong {
-  font-size: .9rem;
-}
-
-.token-task-copy small {
-  color: var(--text-muted);
-  font-size: .79rem;
-  overflow-wrap: anywhere;
-}
-
-.token-task-form {
-  display: grid;
-  gap: 12px;
-  padding: 18px 22px 22px;
-  border-top: 1px solid var(--border);
-}
-
-.token-task-form label,
-.token-admin-copy label {
-  display: grid;
-  gap: 6px;
-  font-size: .85rem;
-  font-weight: 600;
-}
-
-.token-task-form select,
-.token-task-form textarea,
-.token-admin-copy input {
-  width: 100%;
-  min-width: 0;
-  padding: 10px 11px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-}
-
-.token-task-form textarea {
-  min-height: 92px;
-  resize: vertical;
-}
-
-.token-task-form .btn {
-  justify-self: start;
-}
-
-.token-admin-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 22px;
-  border-top: 1px solid var(--border);
-}
-
-.token-admin-copy {
-  display: grid;
-  min-width: 0;
-  flex: 1;
-  gap: 5px;
-}
-
-.token-admin-copy > strong {
-  font-size: .9rem;
-}
-
-.token-admin-copy > small {
-  color: var(--text-muted);
-  font-size: .76rem;
-}
-
-.token-admin-copy p {
-  margin: 3px 0 5px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.token-admin-actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 7px;
-}
-
 .token-state {
   display: flex;
   min-height: 340px;
@@ -437,9 +296,6 @@
     grid-template-columns: 1fr;
   }
 
-  .token-admin-item {
-    flex-direction: column;
-  }
 }
 
 @media (max-width: 520px) {
@@ -472,14 +328,4 @@
     font-size: .84rem;
   }
 
-  .token-task,
-  .token-task-form,
-  .token-admin-item {
-    padding-right: 14px;
-    padding-left: 14px;
-  }
-
-  .token-admin-actions {
-    width: 100%;
-  }
 }

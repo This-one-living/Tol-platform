@@ -6,7 +6,6 @@ import {
   MessageSquare,
   UsersRound,
   Coins,
-  Store,
   Settings,
 } from 'lucide-react'
 
@@ -17,7 +16,6 @@ const links = [
   { to: '/messages', label: 'Messages', icon: MessageSquare },
   { to: '/communities', label: 'Communities', icon: UsersRound },
   { to: '/token-coin', label: 'TOL Coin', icon: Coins },
-  { to: '/marketplace', label: 'Marketplace', icon: Store },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 

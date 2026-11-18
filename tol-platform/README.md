@@ -18,7 +18,7 @@ Apply [`supabase/migrations/20261116000000_discover_profile_search.sql`](./supab
 
 ## Built-in communities setup
 
-Apply [`supabase/migrations/20261116000001_builtin_community_groups.sql`](./supabase/migrations/20261116000001_builtin_community_groups.sql) to seed one group per niche and LGA and enable private user memberships, group counts, and join/leave actions.
+Apply [`supabase/migrations/20261116000001_builtin_community_groups.sql`](./supabase/migrations/20261116000001_builtin_community_groups.sql) to seed one group per niche and LGA and enable private user memberships, group counts, and join/leave actions. Then apply [`supabase/migrations/20261117000000_general_community.sql`](./supabase/migrations/20261117000000_general_community.sql). It adds the permanent General community, enrolls existing members, and automatically enrolls new profiles in General plus their selected niche and LGA groups. Members can join other groups from the Communities page.
 
 ## Seeding test accounts
 
@@ -34,11 +34,13 @@ Apply [`supabase/migrations/20261116000003_account_activity_log.sql`](./supabase
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## TOL Coins, social feed, and Marketplace
+## TOL Coins and social feed
 
-Apply [`src/lib/supabase/migrations/005-social-marketplace-rewards.sql`](./src/lib/supabase/migrations/005-social-marketplace-rewards.sql) after migrations `001` through `004`. The TOL Coin page uses an append-only ledger and awards one TOL Coin per Lagos-local day only after an admin approves all seven daily activity submissions. The former message-per-minute award is disabled for new messages; historical ledger entries and balances remain intact. TOL Coins are not redeemable, and the displayed naira amount is reference-only.
+Apply [`src/lib/supabase/migrations/005-social-marketplace-rewards.sql`](./src/lib/supabase/migrations/005-social-marketplace-rewards.sql) after migrations `001` through `004`, then apply [`src/lib/supabase/migrations/006-message-rewards-remove-marketplace.sql`](./src/lib/supabase/migrations/006-message-rewards-remove-marketplace.sql) after `005` and the direct-messaging migration. The `006` migration restores message-minute rewards, retires the interim activity-approval APIs, and removes Marketplace listings. Previously credited coins remain in members' balances; the interim activity submissions are archived.
 
-The Home feed supports text posts, likes, comments, and sharing. Marketplace supports product and service listings and lets members contact sellers through Messages; it does not process payments.
+Members earn 0.1 TOL Coin for each minute in which they send at least one text message in a one-to-one chat with an accepted connection. The daily limit is 1,440 qualifying minutes (144 TOL Coins). One TOL Coin has a reference value of ₦4 (₦0.40 per qualifying minute); checkout and redemption show as coming soon.
+
+The Home feed supports text posts, likes, comments, and sharing.
 
 Currently, two official plugins are available:
 

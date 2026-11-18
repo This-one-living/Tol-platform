@@ -17,14 +17,25 @@ const empty: FormState = {
 export default function Signup() {
   const [f, setF] = useState<FormState>(empty);
   const [communities, setCommunities] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const set = (k: keyof FormState) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setF((prev) => ({ ...prev, [k]: e.target.value }));
+  const set = (k: keyof FormState) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const value = e.target.value;
+    setF((prev) => {
+      const next = { ...prev, [k]: value };
+      if (k === 'lga') next.community = '';
+      if (k === 'niche') next.category = '';
+      return next;
+    });
+    if (k === 'lga') {
+      setCommunities([]);
+      setError('');
+    }
+  };
   const isOther = f.niche === 'Other';
+  const categories = f.niche && f.niche !== 'Other' ? NICHE_CATEGORIES[f.niche] ?? [] : [];
 
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,25 +51,21 @@ export default function Signup() {
 
   // When the LGA changes, reset the community and load that LGA's communities
   useEffect(() => {
-    setF((p) => ({ ...p, community: '' }));
-    if (!f.lga) { setCommunities([]); return; }
-    if (!supabase) {
-      setCommunities([]);
-      return;
-    }
+    if (!f.lga || !supabase) return;
 
-    supabase.from('communities').select('name').eq('lga', f.lga).order('name')
-      .then(({ data }) => setCommunities((data ?? []).map((c: { name: string }) => c.name)));
+    let active = true;
+    void (async () => {
+      try {
+        const { data, error: communitiesError } = await supabase
+          .from('communities').select('name').eq('lga', f.lga).order('name');
+        if (communitiesError) throw communitiesError;
+        if (active) setCommunities((data ?? []).map((c: { name: string }) => c.name));
+      } catch (communitiesError) {
+        if (active) setError(communitiesError instanceof Error ? communitiesError.message : 'Could not load communities.');
+      }
+    })();
+    return () => { active = false; };
   }, [f.lga]);
-
-  // When the niche changes, reset the category and load that niche's categories
-  useEffect(() => {
-    setF((p) => ({ ...p, category: '' }));
-    if (!f.niche || f.niche === 'Other') { setCategories([]); return; }
-
-    const nicheCategories = NICHE_CATEGORIES[f.niche] ?? [];
-    setCategories(nicheCategories);
-  }, [f.niche]);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -182,6 +189,10 @@ export default function Signup() {
           </select>
         </label>
       )}
+      <p className="muted">
+        You’ll automatically join the General community and groups for your selected niche and LGA.
+        You can join other communities from the Communities page.
+      </p>
       <label>Interests (comma separated)<input value={f.interests} onChange={set('interests')} /></label>
       <label>Skills (comma separated)<input value={f.skills} onChange={set('skills')} /></label>
 

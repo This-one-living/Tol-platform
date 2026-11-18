@@ -7,14 +7,14 @@ import './Communities.css'
 
 type CommunityGroup = {
   group_id: string
-  group_type: 'niche' | 'lga'
+  group_type: 'general' | 'niche' | 'lga'
   group_value: string
   member_count: number
   is_member: boolean
 }
 
 type PageStatus = 'loading' | 'ready' | 'signed-out' | 'unconfigured' | 'error'
-type GroupFilter = 'all' | 'niche' | 'lga' | 'joined'
+type GroupFilter = 'all' | 'general' | 'niche' | 'lga' | 'joined'
 
 export default function Communities() {
   const [status, setStatus] = useState<PageStatus>(supabase ? 'loading' : 'unconfigured')
@@ -153,7 +153,7 @@ export default function Communities() {
         <div>
           <p className="communities-eyebrow">Find your people</p>
           <h1>Communities</h1>
-          <p className="muted">Join groups built around your niche or local government area.</p>
+          <p className="muted">Every member is part of General. Join your niche, LGA, and other groups too.</p>
         </div>
       </header>
 
@@ -172,6 +172,7 @@ export default function Communities() {
           <span className="visually-hidden">Filter groups</span>
           <select value={filter} onChange={(event) => setFilter(event.target.value as GroupFilter)}>
             <option value="all">All groups</option>
+            <option value="general">General community</option>
             <option value="niche">Niche groups</option>
             <option value="lga">LGA groups</option>
             <option value="joined">Your groups</option>
@@ -197,33 +198,40 @@ export default function Communities() {
 
       <div className="community-grid">
         {visibleGroups.map((group) => {
+          const isGeneral = group.group_type === 'general'
           const isNiche = group.group_type === 'niche'
-          const Icon = isNiche ? Tag : MapPin
+          const Icon = isGeneral ? UsersRound : isNiche ? Tag : MapPin
           return (
             <article className="community-card card" key={group.group_id}>
               <div className="community-card-top">
                 <span className="community-icon"><Icon size={20} /></span>
-                <span className="community-kind">{isNiche ? 'Niche group' : 'LGA group'}</span>
+                <span className="community-kind">
+                  {isGeneral ? 'General community' : isNiche ? 'Niche group' : 'LGA group'}
+                </span>
               </div>
               <h2>{group.group_value}</h2>
               <p className="community-description">
-                {isNiche
-                  ? `Connect with members in ${group.group_value}.`
-                  : `Meet members across ${group.group_value} LGA.`}
+                {isGeneral
+                  ? 'A shared community for every TOL member.'
+                  : isNiche
+                    ? `Connect with members in ${group.group_value}.`
+                    : `Meet members across ${group.group_value} LGA.`}
               </p>
               <p className="community-members">
                 <UsersRound size={16} aria-hidden="true" />
                 {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
               </p>
               <button
-                className={group.is_member ? 'btn btn-secondary btn-block' : 'btn btn-primary btn-block'}
+                className={group.is_member || isGeneral ? 'btn btn-secondary btn-block' : 'btn btn-primary btn-block'}
                 type="button"
-                disabled={!!busyGroupId}
+                disabled={!!busyGroupId || isGeneral}
                 onClick={() => void toggleMembership(group)}
               >
-                {busyGroupId === group.group_id
-                  ? 'Updating…'
-                  : group.is_member ? 'Leave group' : 'Join group'}
+                {isGeneral
+                  ? 'Always included'
+                  : busyGroupId === group.group_id
+                    ? 'Updating…'
+                    : group.is_member ? 'Leave group' : 'Join group'}
               </button>
             </article>
           )

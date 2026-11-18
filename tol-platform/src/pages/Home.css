@@ -38,11 +38,7 @@
 }
 
 .feed-composer textarea,
-.feed-comment-form input,
-.marketplace-form input,
-.marketplace-form textarea,
-.marketplace-filters input,
-.marketplace-filters select {
+.feed-comment-form input {
   width: 100%;
   min-width: 0;
   padding: 11px 12px;
@@ -53,8 +49,7 @@
   font: inherit;
 }
 
-.feed-composer textarea,
-.marketplace-form textarea {
+.feed-composer textarea {
   min-height: 112px;
   resize: vertical;
 }
