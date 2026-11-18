@@ -42,6 +42,34 @@ Members earn 0.1 TOL Coin for each minute in which they send at least one text m
 
 The Home feed supports text posts, likes, comments, and sharing.
 
+## Notifications and browser push
+
+Apply [`supabase/migrations/20261118000000_notifications.sql`](./supabase/migrations/20261118000000_notifications.sql) after the core/social-feed migrations, direct messaging, network requests, and built-in communities migrations. It adds the in-app notification center for direct messages, network requests/responses, post comments/likes, and explicit community joins. Notification updates are delivered live through Supabase Realtime. Event announcements are not included because the app does not yet have event publishing.
+
+To enable true browser push delivery:
+
+1. Generate a VAPID key pair with `npx --yes web-push generate-vapid-keys`.
+2. Set the Edge Function secrets and deploy the sender:
+
+   ```sh
+   supabase secrets set PUSH_WEBHOOK_SECRET="<random-secret>" VAPID_PUBLIC_KEY="<public-key>" VAPID_PRIVATE_KEY="<private-key>" VAPID_SUBJECT="mailto:admin@thisoneliving.com"
+   supabase functions deploy send-web-push
+   ```
+
+   The public and private keys must be the matching VAPID pair printed by the key generator.
+3. Add the same public key to the frontend build as `VITE_VAPID_PUBLIC_KEY`.
+4. In the Supabase SQL editor, save the sender URL and the same webhook secret in Vault:
+
+   ```sql
+   select vault.create_secret(
+     'https://<project-ref>.supabase.co/functions/v1/send-web-push',
+     'notification_push_url'
+   );
+   select vault.create_secret('<same PUSH_WEBHOOK_SECRET>', 'notification_push_secret');
+   ```
+
+Users can then enable push from the Notifications page. The in-app center works without the push secrets; push subscriptions are per browser and require HTTPS (except localhost).
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

@@ -11,6 +11,7 @@ import Connections from './pages/Connections.tsx'
 import TokenCoin from './pages/TokenCoin.tsx'
 import ForgotPassword from './pages/ForgotPassword.tsx'
 import ResetPassword from './pages/ResetPassword.tsx'
+import Notifications from './pages/Notifications.tsx'
 
 const isProfileComplete = () => {
   try {
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/connections" element={<Connections />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/communities" element={<Communities />} />
           <Route path="/token-coin" element={<TokenCoin />} />
